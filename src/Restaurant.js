@@ -13,7 +13,7 @@ class Restaurant extends React.Component {
   }
 
   componentDidMount() {
-    const host = process.env.REACT_APP_CONTENT_HOST;
+    const host = process.env.REACT_APP_CONTENT_HOST || 'http://beveragebotbar.com/content';
     const id = this.props.match.params.id;
 
     fetch(`${host}/restaurants/${id}.json`)
