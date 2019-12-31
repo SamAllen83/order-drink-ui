@@ -70,6 +70,39 @@ const OrderButton = styled.button`
   font-size: 25px;
 `;
 
+/**
+ * Default fetch configuration.
+ *
+ * @param {FETCH_METHOD} method - HTTP request method
+ * @param {object} body - HTTP request body
+ *
+ * @return {object} fetch configuration
+ */
+const fetchConfig = (method, body) => {
+    let fetchBody = typeof body === "string" ? body : JSON.stringify(body);
+    return {
+        method: method,
+        headers: {
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache",
+        },
+        credentials: "same-origin",
+        body: fetchBody,
+    };
+};
+
+/**
+ * Fetch methods.
+ * @type {{DELETE: string, POST: string, GET: string, PUT: string}}
+ */
+const FETCH_METHOD = {
+    GET: "GET",
+    POST: "POST",
+    PUT: "PUT",
+    DELETE: "DELETE",
+};
+
 class RestaurantDetails extends React.Component {
   constructor(props) {
     super(props);
@@ -95,11 +128,23 @@ class RestaurantDetails extends React.Component {
   };
 
   submitOrder = () => {
-    alert(
-      `Thank you for your order of the following delicious JSON:\n
+      const restaurantHost = process.env.REACT_APP_RESTAURANT_HOST || 'http://beveragebotbar.com/order';
+      const drinkOrderRequest = {
+          "customerName": "Sam",
+          "drinkName": "beer"
+      };
+      fetch(`${restaurantHost}/api/drink-orders`, fetchConfig(FETCH_METHOD.POST, drinkOrderRequest))
+          .then(result => result.json())
+          .then(drinkOrderResponse => {
+              alert(`Thank you for your order of the following delicious JSON:\n
   ${JSON.stringify(this.state.quantities)}\n
-(This is the end of the demo)`,
-    );
+  (Response from server: ` + JSON.stringify(drinkOrderResponse) + `)
+(This is the end of the demo)`,);
+          })
+          .catch(() => {
+              alert(`Oops, something went wrong`,);
+          });
+
   };
 
   render() {
